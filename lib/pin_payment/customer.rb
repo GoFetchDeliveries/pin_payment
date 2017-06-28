@@ -47,6 +47,28 @@ module PinPayment
       response.map{|x| new(x.delete('token'), x) }
     end
 
+
+    # Adds a card to a customer using the pin API.
+    #
+    # @param [String] token of the customer
+    # @param [String, PinPayment::Card, Hash] card_token the customer's new credit card details
+    # @return [PinPayment::Card]
+    def self.add_card customer_token, card_token = nil
+      attributes = [:card_token]
+      options    = parse_options_for_request(attributes, card_token: card_token)
+      response   = post(URI.parse(PinPayment.api_url).tap{|uri| uri.path = "/1/customers/#{customer_token}/cards" }, options)
+      PinPayment::Card.new(response['token'], response)
+    end
+
+    # Adds a card to a customer using the pin API.
+    #
+    # @param [String] token of the customer
+    # @param [String, PinPayment::Card, Hash] card_token the customer's new credit card details
+    # @return [PinPayment::Card]
+    def self.remove_card customer_token, card_token = nil
+      delete(URI.parse(PinPayment.api_url).tap{|uri| uri.path = "/1/customers/#{customer_token}/cards/#{card_token}" }, { skip_json_parsing: true })
+    end
+
     # Update a customer using the pin API.
     #
     # @param [String] email the customer's new email address

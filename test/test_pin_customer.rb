@@ -67,4 +67,47 @@ class TestPinCustomer < MiniTest::Unit::TestCase
     assert_kind_of String, customer.card.token
     assert customer.card.token.length > 0
   end
+
+  def test_add_card_success
+    card_token = 'card_12345678910'
+    customer = created_customer
+    FakeWeb.register_uri(:post, "https://test-api.pin.net.au/1/customers/#{customer.token}/cards", body: fixtures['responses']['customer']['card']['added'])
+    card = PinPayment::Customer.add_card(customer.token, card_token)
+    assert_kind_of PinPayment::Card, card
+    assert_equal card.token, 'card_23LGmaeLvHj0SM-wa_rQ7g'
+    assert_equal card.display_number, 'XXXX-XXXX-XXXX-0000'
+    assert_equal card.scheme, 'visa'
+    assert_equal card.address_line1, 'Test'
+    assert_equal card.address_line2, 'test'
+    assert_equal card.address_city, 'Lathlain'
+    assert_equal card.address_postcode, '6454'
+    assert_equal card.address_state, 'VIC'
+    assert_equal card.address_country, 'Australia'
+  end
+
+  def test_add_card_failure
+    card_token = 'card_nonexisting_token'
+    customer = created_customer
+    FakeWeb.register_uri(:post, "https://test-api.pin.net.au/1/customers/#{customer.token}/cards", body: fixtures['responses']['customer']['card']['wrong_token_error'])
+    assert_raises PinPayment::Error do
+      PinPayment::Customer.add_card(customer.token, card_token)
+    end
+  end
+
+  def test_remove_card_success
+    card_token = 'card_existing_token'
+    customer = created_customer
+    FakeWeb.register_uri(:delete, "https://test-api.pin.net.au/1/customers/#{customer.token}/cards/#{card_token}", body: fixtures['responses']['customer']['card']['removed'])
+    response = PinPayment::Customer.remove_card(customer.token, card_token)
+    puts response
+  end
+
+  def test_remove_card_failure
+    card_token = 'card_nonexisting_token'
+    customer = created_customer
+    FakeWeb.register_uri(:delete, "https://test-api.pin.net.au/1/customers/#{customer.token}/cards/#{card_token}", body: fixtures['responses']['customer']['card']['wrong_token_error'])
+    assert_raises PinPayment::Error do
+      PinPayment::Customer.remove_card(customer.token, card_token)
+    end
+  end
 end

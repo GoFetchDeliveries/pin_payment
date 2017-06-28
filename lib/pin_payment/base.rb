@@ -40,11 +40,16 @@ module PinPayment
         end
       )
       begin
-        response = JSON.parse(response.body)
+        response = if response.body.empty?
+                     response.body
+                   else
+                     JSON.parse(response.body)
+                   end
       rescue JSON::ParserError => e
         raise Error::InvalidResponse.new(e.message)
       end
       raise(Error.create(response['error'], response['error_description'], response['messages'])) if response['error']
+      return response if response.empty?
       response = response['response']
       response.is_a?(Hash) ? parse_object_tokens(response) : response.map{|x| parse_object_tokens(x) }
     end
