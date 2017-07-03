@@ -40,8 +40,8 @@ module PinPayment
         end
       )
       begin
-        response = if response.body.empty?
-                     response.body
+        response = if response.body.nil? || response.body.empty?
+                     ''
                    else
                      JSON.parse(response.body)
                    end
