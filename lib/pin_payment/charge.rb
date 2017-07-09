@@ -1,7 +1,11 @@
 module PinPayment
   class Charge < Base
-    attr_accessor :token,  :amount,  :currency,  :description,  :email,  :ip_address,  :created_at,  :card,  :customer,  :success,  :total_fees
-    protected     :token=, :amount=, :currency=, :description=, :email=, :ip_address=, :created_at=, :card=, :customer=, :success=, :total_fees=
+    attr_accessor :token,  :amount,  :currency,  :description,  :email,
+                  :ip_address, :created_at, :card, :card_token, :customer,
+                  :success, :total_fees
+    protected     :token=, :amount=, :currency=, :description=, :email=,
+                  :ip_address=, :created_at=, :card=, :card_token, :customer=,
+                  :success=, :total_fees=
 
     # Uses the pin API to create a charge.
     #
@@ -55,7 +59,12 @@ module PinPayment
     protected
 
     def self.attributes
-      [:token, :amount, :currency, :description, :email, :ip_address, :created_at, :card, :customer, :success, :total_fees]
+      [
+        :token, :amount, :currency, :description,
+        :email, :ip_address, :created_at,
+        :card, :card_token, :customer, :success,
+        :total_fees
+      ]
     end
   end
 end

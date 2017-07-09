@@ -64,7 +64,7 @@ module PinPayment
     private
 
     def self.attributes
-      [:token,:email,:name,:bank_account]
+      [:token, :email, :name, :bank_account, :bank_account_token]
     end
 
   end
