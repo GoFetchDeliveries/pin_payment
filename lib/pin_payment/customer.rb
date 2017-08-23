@@ -29,6 +29,15 @@ module PinPayment
       new(token).tap{|c| c.update(email, card_or_token) }
     end
 
+    # Fetches a customer's credit cards using the pin API.
+    #
+    # @param [String] token the customer token
+    # @return [PinPayment::Card]
+    def self.find_cards token
+      response = get(URI.parse(PinPayment.api_url).tap { |uri| uri.path = "/1/customers/#{token}/cards" })
+      response.map { |x| PinPayment::Card.new(x.delete('token'), x) }
+    end
+
     # Fetches a customer using the pin API.
     #
     # @param [String] token the customer token

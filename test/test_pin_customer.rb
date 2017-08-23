@@ -1,4 +1,4 @@
-require 'test_helper'
+require './test_helper'
 
 class TestPinCustomer < MiniTest::Unit::TestCase
   def setup
@@ -53,8 +53,16 @@ class TestPinCustomer < MiniTest::Unit::TestCase
     assert_kind_of PinPayment::Customer, customer
   end
 
+  def test_fetch_all_customer_cards
+    customer = created_customer
+    FakeWeb.register_uri(:get, "https://test-api.pin.net.au/1/customers/#{customer.token}/cards", body: fixtures['responses']['customer']['cards']['all'])
+    cards = PinPayment::Customer.find_cards customer.token
+    assert_kind_of Array, cards
+    assert_kind_of PinPayment::Card, cards.first
+  end
+
   def test_fetch_all_customers
-    FakeWeb.register_uri(:get, 'https://test-api.pin.net.au/1/customers', body: fixtures['responses']['customer']['all'])
+    FakeWeb.register_uri(:get, 'https://test-api.pin.net.au/1/customers', body: fixtures['responses']['customer']['cards']['all'])
     customers = PinPayment::Customer.all
     assert_kind_of Array, customers
     assert_kind_of PinPayment::Customer, customers.first
